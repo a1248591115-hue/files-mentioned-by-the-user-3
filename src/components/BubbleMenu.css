@@ -1,0 +1,90 @@
+.bubble-menu-card {
+  position: absolute;
+  right: 22px;
+  bottom: 20px;
+  left: 22px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.bubble-menu-card .pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bubble-menu-card .pill-col {
+  display: flex;
+}
+
+.bubble-menu-card .pill-link {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: var(--pill-color);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  opacity: 0;
+  transform: rotate(var(--item-rot));
+  transform-origin: 50% 50%;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+.bubble-menu-card .pill-label {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.strength-card-accent .bubble-menu-card .pill-link {
+  border-color: rgba(20, 14, 32, 0.12);
+  box-shadow:
+    0 18px 34px rgba(20, 14, 32, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+.strength-bubble-menu {
+  top: 142px;
+  right: auto;
+  bottom: auto;
+  left: 28px;
+  max-width: min(78%, 390px);
+}
+
+.strength-bubble-menu .pill-list {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.strength-bubble-menu .pill-col:nth-child(2) {
+  transform: translateY(14px);
+}
+
+.strength-bubble-menu .pill-col:nth-child(3) {
+  transform: translateY(28px);
+}
+
+.strength-bubble-menu .pill-link {
+  min-height: 38px;
+  padding: 0 18px;
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow:
+    0 18px 34px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
