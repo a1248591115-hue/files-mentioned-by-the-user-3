@@ -1242,7 +1242,7 @@ function Hero() {
           {isMuted ? '声音关闭' : '声音开启'}
         </button>
         <a className="video-home-link" href="https://space.bilibili.com/10425526?" target="_blank" rel="noreferrer">
-          视频主页
+          本人B站视频主页
           <ExternalLink size={16} aria-hidden="true" />
         </a>
       </div>
