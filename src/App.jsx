@@ -20,7 +20,6 @@ import {
   VolumeX,
 } from 'lucide-react';
 import BorderGlow from './components/BorderGlow';
-import BubbleMenu from './components/BubbleMenu';
 import CountUp from './components/CountUp';
 import Folder from './components/Folder';
 import SpotlightCard from './components/SpotlightCard';
@@ -29,6 +28,7 @@ import { portfolioWorks } from './portfolioWorks.generated';
 const profileAvatarImage = '/assets/profile-avatar.jpg';
 
 const CircularGallery = lazy(() => import('./components/CircularGallery'));
+const ElasticSlider = lazy(() => import('./components/ElasticSlider'));
 const Grainient = lazy(() => import('./components/Grainient'));
 const Masonry = lazy(() => import('./components/Masonry'));
 const TiltedCard = lazy(() => import('./components/TiltedCard'));
@@ -517,16 +517,12 @@ function usePortfolioPreloader() {
 function OpeningPreloader({ progress, isComplete }) {
   return (
     <div className={`opening-loader ${isComplete ? 'is-complete' : ''}`} role="status" aria-live="polite">
-      <div className="opening-loader__panel">
-        <span className="opening-loader__eyebrow">LinM Portfolio</span>
+      <div className="opening-loader__content">
+        <span className="opening-loader__eyebrow">Loading Portfolio</span>
         <div className="opening-loader__number">
           <CountUp to={progress} from={0} duration={0.85} startWhen separator="" />
           <small>%</small>
         </div>
-        <div className="opening-loader__bar" aria-hidden="true">
-          <span style={{ transform: `scaleX(${Math.max(progress, 4) / 100})` }} />
-        </div>
-        <p>Preloading key visuals / WebGL / hero motion</p>
       </div>
     </div>
   );
@@ -1206,19 +1202,31 @@ function ProjectModal({ project, onClose }) {
 function Hero() {
   const [activeProject, setActiveProject] = useState(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [volume, setVolume] = useState(0);
   const videoRef = useRef(null);
 
-  const toggleVideoSound = () => {
+  const handleVolumeChange = useCallback((nextValue) => {
     const video = videoRef.current;
-    const nextMuted = !isMuted;
+    const nextVolume = Math.round(nextValue);
+    const nextMuted = nextVolume <= 0;
+
+    setVolume(nextVolume);
     setIsMuted(nextMuted);
 
     if (video) {
       video.muted = nextMuted;
-      video.volume = nextMuted ? 0 : 0.55;
-      video.play().catch(() => {});
+      video.volume = nextMuted ? 0 : Math.min(nextVolume / 100, 1);
+      if (!nextMuted) video.play().catch(() => {});
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = isMuted;
+    video.volume = isMuted ? 0 : Math.min(volume / 100, 1);
+  }, [isMuted, volume]);
 
   return (
     <section className="hero" id="hero">
@@ -1237,10 +1245,28 @@ function Hero() {
       </video>
       <div className="hero-shade" />
       <div className="hero-media-actions" aria-label="视频控制">
-        <button className="video-sound-toggle" type="button" onClick={toggleVideoSound} aria-pressed={!isMuted}>
-          {isMuted ? <VolumeX size={18} aria-hidden="true" /> : <Volume2 size={18} aria-hidden="true" />}
-          {isMuted ? '声音关闭' : '声音开启'}
-        </button>
+        <Suspense
+          fallback={
+            <div className="video-sound-toggle video-sound-fallback" aria-hidden="true">
+              <VolumeX size={18} />
+              <span>声音关闭</span>
+            </div>
+          }
+        >
+          <ElasticSlider
+            className="video-sound-toggle"
+            label="视频音量"
+            mutedLabel="声音关闭"
+            activeLabel="声音开启"
+            value={volume}
+            min={0}
+            max={100}
+            step={5}
+            leftIcon={<VolumeX aria-hidden="true" />}
+            rightIcon={<Volume2 aria-hidden="true" />}
+            onChange={handleVolumeChange}
+          />
+        </Suspense>
         <a className="video-home-link" href="https://space.bilibili.com/10425526?" target="_blank" rel="noreferrer">
           本人B站视频主页
           <ExternalLink size={16} aria-hidden="true" />
@@ -1601,15 +1627,15 @@ function Strengths() {
               className="strength-card"
               key={title}
               edgeSensitivity={16}
-              glowColor="262 100 88"
+              glowColor="294 100 78"
               backgroundColor="#090d14"
               borderRadius={20}
-              glowRadius={58}
-              glowIntensity={2.4}
-              coneSpread={34}
+              glowRadius={66}
+              glowIntensity={2.8}
+              coneSpread={38}
               animated={index === 0}
-              colors={['#efe6ff', '#d8c7ff', '#b99cff']}
-              fillOpacity={0.72}
+              colors={['#ff4fd8', '#69f6ff', '#f6ff6b']}
+              fillOpacity={0.78}
             >
               <div className="strength-card-top">
                 <span>{String(index + 1).padStart(2, '0')}</span>
@@ -1617,14 +1643,11 @@ function Strengths() {
               </div>
               <h3>{title}</h3>
               <p>{text}</p>
-              <div className="strength-shape" aria-hidden="true" />
-              <BubbleMenu
-                className="strength-bubble-menu"
-                items={strengthBubbleItems[index].slice(0, 3)}
-                animationEase="power3.out"
-                animationDuration={0.62}
-                staggerDelay={0.075}
-              />
+              <div className="strength-tag-orbit" aria-label={`${title} 关键词`}>
+                {strengthBubbleItems[index].slice(0, 3).map((item) => (
+                  <span key={item.label}>{item.label}</span>
+                ))}
+              </div>
             </BorderGlow>
           ))}
         </div>
@@ -1716,5 +1739,3 @@ export default function App() {
     </div>
   );
 }
-
-
